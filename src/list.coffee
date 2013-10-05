@@ -21,6 +21,7 @@ module.exports =
   # Surnames
   sur:
     # Unisex
+    # TODO to be sorted into male / female
     u: [
       [ "Nguyễn", "阮" ]
       [ "Trần", "陳" ]
