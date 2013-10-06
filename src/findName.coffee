@@ -1,31 +1,15 @@
-if require
-  _         = require 'underscore'
-  unidecode = require 'unidecode'
-  FuzzySet  = require 'fuzzyset.js'
-  list      = require './list'
+if require?
+  _        = require 'underscore'
+  FuzzySet = require 'fuzzyset.js'
+else
+  setTimeout (->
+    console.log _, FuzzySet
+    { _, FuzzySet } = window
+  ), 0
 
-toArray = (el) -> if _.isArray el then el else [ el ]
-
-# Transform the data source array that is nice for maintaining data
-# into a format that is nice for programming
-processNames = (names) ->
-  _.chain(names)
-    # make the data programmer friendly :)
-    .map(([ vietnamese, chinese, description ]) ->
-      { vietnamese, chinese, description }
-    )
-    # multiple entries possible for some fields
-    .map((row) ->
-      row.vietnamese = toArray row.vietnamese
-      row.chinese = toArray row.chinese
-      row
-    )
-    .value()
+# Server and client side
 
 findNames = (names, sourceName) ->
-  names.map (row) ->
-    row.normalized = row.vietnamese.map unidecode
-
   a = FuzzySet()
   names.forEach (row) ->
     row.normalized.forEach (name) ->
@@ -35,9 +19,16 @@ findNames = (names, sourceName) ->
     _.some row.normalized, (n) ->
       _.some suggestions, (s) -> s[1] is n
 
-names = processNames list.sur.u
-sourceName = process.argv[2]
-name = findNames names, sourceName
+if module?
+  module.exports = findNames
 
-unless module?.parent
+if module? and ! module.parent
+  list         = require './list'
+  processNames = require './processNames'
+  names        = processNames list.sur.u
+  sourceName   = process.argv[2]
+  name         = findNames names, sourceName
   require('eyes').inspect name, 'Vietnamese name'
+
+unless module?
+  window.VietNameExample = findNames
