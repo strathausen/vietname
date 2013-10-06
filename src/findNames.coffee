@@ -21,7 +21,7 @@ processNames = (names) ->
     )
     .value()
 
-findName = (names, sourceName) ->
+findNames = (names, sourceName) ->
   names.map (row) ->
     row.normalized = row.vietnamese.map unidecode
 
@@ -30,9 +30,12 @@ findName = (names, sourceName) ->
     row.normalized.forEach (name) ->
       a.add name
   suggestions = a.get sourceName
+  names.filter (row) ->
+    _.some row.normalized, (n) ->
+      _.some suggestions, (s) -> s[1] is n
 
 names = processNames list.sur.u
 sourceName = process.argv[2]
-name = findName names, sourceName
+name = findNames names, sourceName
 
 require('eyes').inspect name, 'Vietnamese name'
