@@ -1,7 +1,10 @@
-_         = require 'underscore'
-unidecode = require 'unidecode'
-FuzzySet  = require 'fuzzyset.js'
-list      = require './list'
+if require
+  _         = require 'underscore'
+  unidecode = require 'unidecode'
+  FuzzySet  = require 'fuzzyset.js'
+  list      = require './list'
+else
+  { list } = VietName
 
 toArray = (el) -> if _.isArray el then el else [ el ]
 
@@ -38,4 +41,9 @@ names = processNames list.sur.u
 sourceName = process.argv[2]
 name = findNames names, sourceName
 
-require('eyes').inspect name, 'Vietnamese name'
+if module
+  module.exports = findNames
+else
+  window.VietName.findNames = findNames
+unless module?.parent
+  require('eyes').inspect name, 'Vietnamese name'
